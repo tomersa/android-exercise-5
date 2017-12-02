@@ -1,4 +1,8 @@
 <resources>
     <string name="app_name">My Application</string>
     <string name="search">Search</string>
+    <string name="status_searching">Searching...</string>
+    <string name="results_found_status">%d hits were found for %s</string>
+    <string name="error_status">Error</string>
+
 </resources>

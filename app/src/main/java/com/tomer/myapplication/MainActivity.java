@@ -47,8 +47,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void searchKeyword(View view) {
+        resultTextView.setText(getResources().getText(R.string.status_searching));
+
         //get search term
-        String searchTerm = searchTermEditText.getText().toString();
+        final String searchTerm = searchTermEditText.getText().toString();
 
         //run request on Pixabay
         PixabayService pixabayService = ServiceGenerator.retrofit.create(PixabayService.class);
@@ -67,13 +69,19 @@ public class MainActivity extends AppCompatActivity {
                     return;
                 }
 
+                resultTextView.
+                        setText(String.format(getResources().getText(R.string.
+                                                                        results_found_status).toString(),
+                                              response.body().getTotalHits(),
+                                              searchTerm));
+
                 mAdapter.setDataSource(response.body().getHits());
                 mAdapter.notifyDataSetChanged();
             }
 
             @Override
             public void onFailure(Call<ImageSearchResult> call, Throwable t) {
-
+                resultTextView.setText(getResources().getText(R.string.error_status));
             }
         });
     }
