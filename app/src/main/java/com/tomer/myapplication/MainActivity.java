@@ -1,17 +1,19 @@
 package com.tomer.myapplication;
 
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.tomer.myapplication.rest.ImageSearchResult;
 import com.tomer.myapplication.rest.ImageSearchResult;
 import com.tomer.myapplication.rest.PixabayService;
 import com.tomer.myapplication.rest.ServiceGenerator;
+import com.tomer.myapplication.ui.ImageAdapter;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -20,6 +22,10 @@ import retrofit2.Response;
 public class MainActivity extends AppCompatActivity {
     EditText searchTermEditText;
     TextView resultTextView;
+    RecyclerView mRecyclerView;
+
+    private LinearLayoutManager mLayoutManager;
+    private ImageAdapter mAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,6 +34,16 @@ public class MainActivity extends AppCompatActivity {
 
         searchTermEditText = findViewById(R.id.search_url_etv);
         resultTextView = findViewById(R.id.hits_tv);
+        mRecyclerView = findViewById(R.id.list_rv);
+
+        initRecycleView();
+    }
+
+    private void initRecycleView() {
+        mLayoutManager = new GridLayoutManager(getApplicationContext(), 1);
+        mRecyclerView.setLayoutManager(mLayoutManager);
+        mAdapter = new ImageAdapter();
+        mRecyclerView.setAdapter(mAdapter);
     }
 
     public void searchKeyword(View view) {
@@ -51,8 +67,8 @@ public class MainActivity extends AppCompatActivity {
                     return;
                 }
 
-                ImageSearchResult data = response.body();
-                Toast.makeText(getApplicationContext(), Integer.toString(data.getTotal()), Toast.LENGTH_LONG).show();
+                mAdapter.setDataSource(response.body().getHits());
+                mAdapter.notifyDataSetChanged();
             }
 
             @Override
@@ -60,7 +76,5 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
-
-        //add result to result_tv
     }
 }
