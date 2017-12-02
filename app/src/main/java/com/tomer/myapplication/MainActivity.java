@@ -5,7 +5,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Editable;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -23,6 +25,7 @@ public class MainActivity extends AppCompatActivity {
     EditText searchTermEditText;
     TextView resultTextView;
     RecyclerView mRecyclerView;
+    TextView searchTV;
 
     private LinearLayoutManager mLayoutManager;
     private ImageAdapter mAdapter;
@@ -35,8 +38,27 @@ public class MainActivity extends AppCompatActivity {
         searchTermEditText = findViewById(R.id.search_url_etv);
         resultTextView = findViewById(R.id.hits_tv);
         mRecyclerView = findViewById(R.id.list_rv);
+        searchTV = findViewById(R.id.search_tv);
 
         initRecycleView();
+
+        searchTermEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                ServiceGenerator.currentPage = 1;
+                searchTV.setText(getResources().getString(R.string.search));
+            }
+        });
     }
 
     private void initRecycleView() {
@@ -52,15 +74,16 @@ public class MainActivity extends AppCompatActivity {
         //get search term
         final String searchTerm = searchTermEditText.getText().toString();
 
+        ServiceGenerator.currentPage++;
+
+        searchTV.setText(getResources().getString(R.string.search_next));
+
+
         //run request on Pixabay
         PixabayService pixabayService = ServiceGenerator.retrofit.create(PixabayService.class);
         String plusSeparatedSearchTerm = TextUtils.join("+", searchTerm.split(" "));
         Call<ImageSearchResult> call = pixabayService.
-                getImageSearchResult(
-                        ServiceGenerator.PIXABAY_KEY,
-                        plusSeparatedSearchTerm,
-                        ServiceGenerator.IMAGE_TYPE
-                );
+                getImageSearchResult(plusSeparatedSearchTerm, ServiceGenerator.currentPage);
 
         call.enqueue(new Callback<ImageSearchResult>() {
             @Override
